@@ -89,7 +89,7 @@ public class PetController {
 
 	}
 
-	@PutMapping("/archive/{id}")
+	@PutMapping("/active/{id}")
 	public ResponseEntity<Pet> archivePet(@PathVariable("id") UUID petId) {
 		Optional<br.com.pluspet.core.entity.Pet> petEntity = service.findById(petId);
 

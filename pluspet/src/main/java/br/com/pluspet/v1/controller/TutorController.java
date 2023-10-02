@@ -94,7 +94,7 @@ public class TutorController {
 
 	}
 
-	@PutMapping("/archive/{id}")
+	@PutMapping("/active/{id}")
 	public ResponseEntity<Tutor> archiveTutor(@PathVariable("id") UUID tutorId) {
 		br.com.pluspet.core.entity.Tutor tutor = tutorService.archiveTutor(tutorId);
 
