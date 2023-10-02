@@ -42,6 +42,10 @@ public class Pet {
 	@NotBlank(message = "Raça {jakarta.validation.constraints.NotBlank.message}")
 	private String breed;
 
+	@Column(name = "archived")
+	@NotNull(message = "Tutor ativo {jakarta.validation.constraints.NotNull.message}")
+	private Boolean archived = false;
+
 	@ManyToOne
 	@JoinColumn(name = "tutor")
 	@NotNull(message = "Tutor {jakarta.validation.constraints.NotNull.message}")

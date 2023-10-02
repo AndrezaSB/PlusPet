@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.pluspet.core.entity.Tutor;
 import br.com.pluspet.core.repository.TutorRepository;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class TutorService extends AbstractService<Tutor, UUID, TutorRepository> {
@@ -26,5 +27,18 @@ public class TutorService extends AbstractService<Tutor, UUID, TutorRepository> 
 
 	public Tutor saveTutor(Tutor tutor) {
 		return repository.save(tutor);
+	}
+
+	public Tutor archiveTutor(UUID tutorId) {
+		Optional<br.com.pluspet.core.entity.Tutor> tutor = this.findById(tutorId);
+
+		if (tutor.isPresent()) {
+			tutor.get().setArchived(true);
+		} else {
+			return null;
+		}
+
+		return this.saveTutor(tutor.get());
+
 	}
 }
