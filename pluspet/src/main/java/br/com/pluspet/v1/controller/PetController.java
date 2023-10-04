@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import br.com.pluspet.core.entity.Tutor;
 import br.com.pluspet.core.service.PetService;
+import br.com.pluspet.core.service.TutorService;
 import br.com.pluspet.v1.dto.Pet;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -31,6 +33,9 @@ public class PetController {
 
 	@Autowired
 	private PetService service;
+
+	@Autowired
+	private TutorService tutorService;
 
 	@Autowired
 	private ModelMapper mapper;
@@ -77,10 +82,13 @@ public class PetController {
 
 	@PostMapping
 	public ResponseEntity<Pet> savePet(@RequestBody @Valid Pet pet) {
-		br.com.pluspet.core.entity.Pet savedPetEntity = service
-				.savePet(mapper.map(pet, br.com.pluspet.core.entity.Pet.class));
 
-		Pet savedDTO = mapper.map(savedPetEntity, Pet.class);
+		br.com.pluspet.core.entity.Pet savePet = mapper.map(pet, br.com.pluspet.core.entity.Pet.class);
+
+		savePet.setTutor(Optional.ofNullable(tutorService.findById(pet.getTutor().getId()))
+				.map(tutorEntity -> tutorEntity.get()).orElseThrow(EntityNotFoundException::new));
+
+		Pet savedDTO = mapper.map(service.savePet(savePet), Pet.class);
 
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedDTO.getId())
 				.toUri();
@@ -95,6 +103,25 @@ public class PetController {
 
 		if (petEntity.isPresent()) {
 			petEntity.get().setArchived(true);
+		} else {
+			throw new EntityNotFoundException();
+		}
+
+		return ResponseEntity.ok(mapper.map(service.savePet(petEntity.get()), Pet.class));
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<Pet> editTutor(@PathVariable("id") UUID petId, @RequestBody @Valid Pet pet) {
+		Optional<br.com.pluspet.core.entity.Pet> petEntity = service.findByIdActive(petId);
+
+		if (petEntity.isPresent()) {
+			petEntity.get().setTutor(Optional.ofNullable(tutorService.findById(pet.getTutor().getId()))
+					.map(tutorEntity -> tutorEntity.get()).orElseThrow(EntityNotFoundException::new));
+			petEntity.get().setBirthDate(pet.getBirthDate());
+			petEntity.get().setBreed(pet.getBreed());
+			petEntity.get().setName(pet.getName());
+			petEntity.get().setType(pet.getType());
+
 		} else {
 			throw new EntityNotFoundException();
 		}

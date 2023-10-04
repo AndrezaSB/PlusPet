@@ -5,8 +5,10 @@ import java.util.UUID;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -46,7 +48,7 @@ public class Pet {
 	@NotNull(message = "Tutor ativo {jakarta.validation.constraints.NotNull.message}")
 	private Boolean archived = false;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "tutor")
 	@NotNull(message = "Tutor {jakarta.validation.constraints.NotNull.message}")
 	private Tutor tutor;

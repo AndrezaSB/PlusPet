@@ -23,9 +23,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import br.com.pluspet.core.entity.Address;
 import br.com.pluspet.core.entity.Pet;
 import br.com.pluspet.core.entity.Telephone;
+import br.com.pluspet.core.entity.Tutor;
 import br.com.pluspet.core.service.PetService;
 import br.com.pluspet.core.service.TutorService;
-import br.com.pluspet.v1.dto.Tutor;
+import br.com.pluspet.v1.dto.TutorRequest;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
@@ -43,12 +44,12 @@ public class TutorController {
 	private ModelMapper mapper;
 
 	@GetMapping
-	public ResponseEntity<List<Tutor>> listAll() {
+	public ResponseEntity<List<TutorRequest>> listAll() {
 
-		List<Tutor> tutors = Optional.ofNullable(tutorService.findAll()).orElseGet(Collections::emptyList).stream()
-				.map(tutor -> mapper.map(tutor, Tutor.class)).collect(toList());
+		List<TutorRequest> tutors = Optional.ofNullable(tutorService.findAll()).orElseGet(Collections::emptyList)
+				.stream().map(tutor -> mapper.map(tutor, TutorRequest.class)).collect(toList());
 
-		mapper.map(tutorService.findAll(), Tutor.class);
+		mapper.map(tutorService.findAll(), TutorRequest.class);
 
 		if (tutors.isEmpty()) {
 			throw new EntityNotFoundException();
@@ -59,10 +60,10 @@ public class TutorController {
 	}
 
 	@GetMapping("/active")
-	public ResponseEntity<List<Tutor>> listAllActive() {
+	public ResponseEntity<List<TutorRequest>> listAllActive() {
 
-		List<Tutor> tutors = Optional.ofNullable(tutorService.findActives()).orElseGet(Collections::emptyList).stream()
-				.map(tutor -> mapper.map(tutor, Tutor.class)).collect(toList());
+		List<TutorRequest> tutors = Optional.ofNullable(tutorService.findActives()).orElseGet(Collections::emptyList)
+				.stream().map(tutor -> mapper.map(tutor, TutorRequest.class)).collect(toList());
 
 		if (tutors.isEmpty()) {
 			throw new EntityNotFoundException();
@@ -73,19 +74,18 @@ public class TutorController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Tutor> findTutor(@PathVariable("id") UUID tutorId) {
-		Tutor tutor = mapper.map(tutorService.findById(tutorId), Tutor.class);
+	public ResponseEntity<TutorRequest> findTutor(@PathVariable("id") UUID tutorId) {
+		TutorRequest tutor = mapper.map(tutorService.findById(tutorId), TutorRequest.class);
 
 		return Optional.ofNullable(tutor).map(tutorResponse -> ResponseEntity.ok(tutorResponse))
 				.orElseThrow(EntityNotFoundException::new);
 	}
 
 	@PostMapping
-	public ResponseEntity<Tutor> saveTutor(@RequestBody @Valid Tutor tutor) {
-		br.com.pluspet.core.entity.Tutor savedTutorEntity = tutorService
-				.saveTutor(mapper.map(tutor, br.com.pluspet.core.entity.Tutor.class));
+	public ResponseEntity<TutorRequest> saveTutor(@RequestBody @Valid TutorRequest tutor) {
+		Tutor savedTutorEntity = tutorService.saveTutor(mapper.map(tutor, Tutor.class));
 
-		Tutor savedDTO = mapper.map(savedTutorEntity, Tutor.class);
+		TutorRequest savedDTO = mapper.map(savedTutorEntity, TutorRequest.class);
 
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedDTO.getId())
 				.toUri();
@@ -95,8 +95,8 @@ public class TutorController {
 	}
 
 	@PutMapping("/active/{id}")
-	public ResponseEntity<Tutor> archiveTutor(@PathVariable("id") UUID tutorId) {
-		br.com.pluspet.core.entity.Tutor tutor = tutorService.archiveTutor(tutorId);
+	public ResponseEntity<TutorRequest> archiveTutor(@PathVariable("id") UUID tutorId) {
+		Tutor tutor = tutorService.archiveTutor(tutorId);
 
 		if (tutor != null) {
 			petService.archivePetsByTutor(tutorId);
@@ -104,12 +104,12 @@ public class TutorController {
 			throw new EntityNotFoundException();
 		}
 
-		return ResponseEntity.ok(mapper.map(tutorService.saveTutor(tutor), Tutor.class));
+		return ResponseEntity.ok(mapper.map(tutorService.saveTutor(tutor), TutorRequest.class));
 	}
 
 //	@PutMapping("/{id}")
 //	public ResponseEntity<Tutor> editTutor(@PathVariable("id") UUID tutorId, @RequestBody @Valid Tutor tutor) {
-//		Optional<br.com.pluspet.core.entity.Tutor> tutorEntity = service.findByIdActive(tutorId);
+//		Optional<Tutor> tutorEntity = service.findByIdActive(tutorId);
 //
 //		if (tutorEntity.isPresent()) {
 //
@@ -139,7 +139,7 @@ public class TutorController {
 //			throw new EntityNotFoundException();
 //		}
 //
-////		Tutor savedTutor = ervice.saveTutor(mapper.map(tutor, br.com.pluspet.core.entity.Tutor.class));
+////		Tutor savedTutor = ervice.saveTutor(mapper.map(tutor, Tutor.class));
 //
 //		return ResponseEntity.ok(mapper.map(service.saveTutor(tutorEntity.get()), Tutor.class));
 //	}

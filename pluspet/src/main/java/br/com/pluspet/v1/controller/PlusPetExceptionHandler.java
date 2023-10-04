@@ -24,8 +24,7 @@ public class PlusPetExceptionHandler {
 	public ResponseEntity<ErrorMessage> error400(MethodArgumentNotValidException ex) {
 		Set<String> messages = ex.getBindingResult().getAllErrors().stream().map(err -> messageSource.getMessage(err))
 				.collect(toSet());
-		return ResponseEntity.badRequest()
-				.body(ErrorMessage.builder().message(messageSource.getMessage("Test")).messages(messages).build());
+		return ResponseEntity.badRequest().body(ErrorMessage.builder().message("Test").messages(messages).build());
 	}
 
 	@ExceptionHandler(EntityNotFoundException.class)
@@ -35,8 +34,7 @@ public class PlusPetExceptionHandler {
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<ErrorMessage> manageError400(HttpMessageNotReadableException ex) {
-		return ResponseEntity.badRequest()
-				.body(ErrorMessage.builder().message(messageSource.getMessage("Test")).build());
+		return ResponseEntity.badRequest().body(ErrorMessage.builder().message("Test").build());
 	}
 
 //@ExceptionHandler(MethodArgumentTypeMismatchException.class)

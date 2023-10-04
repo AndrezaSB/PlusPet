@@ -31,5 +31,5 @@ public class Pet {
 	private Boolean archived = false;
 
 	@NotNull(message = "Tutor {jakarta.validation.constraints.NotNull.message}")
-	private Tutor tutor;
+	private PetTutorRequest tutor;
 }
