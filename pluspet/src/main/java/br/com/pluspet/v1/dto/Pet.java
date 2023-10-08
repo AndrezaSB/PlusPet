@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -31,5 +32,5 @@ public class Pet {
 	private Boolean archived = false;
 
 	@NotNull(message = "Tutor {jakarta.validation.constraints.NotNull.message}")
-	private PetTutorRequest tutor;
+	private @Valid TutorBasicInfo tutor;
 }

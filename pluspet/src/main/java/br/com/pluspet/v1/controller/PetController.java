@@ -10,7 +10,12 @@ import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,10 +25,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import br.com.pluspet.core.entity.Tutor;
 import br.com.pluspet.core.service.PetService;
 import br.com.pluspet.core.service.TutorService;
 import br.com.pluspet.v1.dto.Pet;
+import br.com.pluspet.v1.dto.TutorBasicInfo;
+import br.com.pluspet.v1.validation.BasicInfo;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 
@@ -41,34 +47,16 @@ public class PetController {
 	private ModelMapper mapper;
 
 	@GetMapping
-	public ResponseEntity<List<Pet>> listAll() {
-
-		List<Pet> pets = Optional.ofNullable(service.findAll()).orElseGet(Collections::emptyList).stream()
-				.map(pet -> mapper.map(pet, Pet.class)).collect(toList());
-
-		mapper.map(service.findAll(), Pet.class);
-
-		if (pets.isEmpty()) {
-			throw new EntityNotFoundException();
-		} else {
-			return ResponseEntity.ok(pets);
-		}
+	public ResponseEntity<Page<Pet>> listAll(@PageableDefault(size = 10, page = 0, sort = {
+			"name" }, direction = Sort.Direction.ASC) Pageable pageable) {
+		return ResponseEntity.ok(service.findAll(pageable).map(pet -> mapper.map(pet, Pet.class)));
 
 	}
 
 	@GetMapping("/active")
-	public ResponseEntity<List<Pet>> listAllActive() {
-
-		List<Pet> pets = Optional.ofNullable(service.findActives()).orElseGet(Collections::emptyList).stream()
-				.map(pet -> mapper.map(pet, Pet.class)).collect(toList());
-
-		mapper.map(service.findAll(), Pet.class);
-
-		if (pets.isEmpty()) {
-			throw new EntityNotFoundException();
-		} else {
-			return ResponseEntity.ok(pets);
-		}
+	public ResponseEntity<Page<Pet>> listAllActive(@PageableDefault(size = 10, page = 0, sort = {
+			"name" }, direction = Sort.Direction.ASC) Pageable pageable) {
+		return ResponseEntity.ok(service.findActives(pageable).map(pet -> mapper.map(pet, Pet.class)));
 
 	}
 

@@ -1,14 +1,14 @@
 package br.com.pluspet.core.service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.com.pluspet.core.entity.Tutor;
 import br.com.pluspet.core.repository.TutorRepository;
-import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class TutorService extends AbstractService<Tutor, UUID, TutorRepository> {
@@ -21,8 +21,8 @@ public class TutorService extends AbstractService<Tutor, UUID, TutorRepository> 
 		return repository.findByIdAndArchivedFalse(tutorId);
 	}
 
-	public List<Tutor> findActives() {
-		return repository.findByArchivedFalse();
+	public Page<Tutor> findActives(Pageable pageable) {
+		return repository.findByArchived(false, pageable);
 	}
 
 	public Tutor saveTutor(Tutor tutor) {

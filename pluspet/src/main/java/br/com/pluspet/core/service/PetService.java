@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.com.pluspet.core.entity.Pet;
@@ -20,8 +22,8 @@ public class PetService extends AbstractService<Pet, UUID, PetRepository> {
 		return repository.findByIdAndArchivedFalse(petId);
 	}
 
-	public List<Pet> findActives() {
-		return repository.findByArchivedFalse();
+	public Page<Pet> findActives(Pageable pageable) {
+		return repository.findByArchived(false, pageable);
 	}
 
 	public Pet savePet(Pet pet) {
