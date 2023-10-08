@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
-import br.com.pluspet.core.enums.AnimalSex;
+import br.com.pluspet.core.enums.AnimalGender;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -28,7 +28,7 @@ public class Pet {
 	private String spieces;
 
 	@NotNull(message = "Sexo {jakarta.validation.constraints.NotBlank.message}")
-	private String animalSex;
+	private String animalGender;
 
 	@NotBlank(message = "Raça {jakarta.validation.constraints.NotBlank.message}")
 	private String breed;
@@ -40,12 +40,12 @@ public class Pet {
 	private @Valid TutorBasicInfo tutor;
 
 	@JsonIgnore
-	public AnimalSex getSex() {
-		return AnimalSex.fromDescription(animalSex);
+	public AnimalGender getGender() {
+		return AnimalGender.fromDescription(animalGender);
 	}
 
 	@JsonIgnore
-	public void setSex(AnimalSex animalSexEnum) {
-		this.animalSex = animalSexEnum.getDescription();
+	public void setGender(AnimalGender animalGenderEnum) {
+		this.animalGender = animalGenderEnum.getDescription();
 	}
 }

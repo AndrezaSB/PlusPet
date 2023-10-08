@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import br.com.pluspet.core.enums.AnimalSex;
+import br.com.pluspet.core.enums.AnimalGender;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,10 +42,10 @@ public class Pet {
 	@NotBlank(message = "Espécie {jakarta.validation.constraints.NotBlank.message}")
 	private String spieces;
 
-	@Column(name = "sex")
+	@Column(name = "gender")
 	@NotNull(message = "Sexo {jakarta.validation.constraints.NotNull.message}")
 	@Enumerated(EnumType.STRING)
-	private AnimalSex sex;
+	private AnimalGender gender;
 
 	@Column(name = "breed")
 	@NotBlank(message = "Raça {jakarta.validation.constraints.NotBlank.message}")
@@ -60,22 +60,4 @@ public class Pet {
 	@NotNull(message = "Tutor {jakarta.validation.constraints.NotNull.message}")
 	private Tutor tutor;
 
-//	@Transient
-//	private String animalSex;
-//
-//	@PostLoad
-//	private void fillTransient() {
-//		if (sex != null) {
-//			this.animalSex = sex.getDescription();
-//		}
-//	}
-//
-//	@PrePersist
-//	private void fillPersistentValues() {
-//		if (animalSex != null) {
-//			this.sex = AnimalSex.fromDescription(animalSex);
-//		} else {
-//			this.sex = null;
-//		}
-//	}
 }

@@ -1,6 +1,6 @@
 package br.com.pluspet.core.vo;
 
-import br.com.pluspet.core.enums.AnimalSex;
+import br.com.pluspet.core.enums.AnimalGender;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,13 +11,13 @@ public class PetFilter {
 	private String name;
 	private String tutorName;
 	private String spieces;
-	private String sex;
+	private String gender;
 
-	public String getSexName() {
-		AnimalSex sexName = AnimalSex.fromDescription(this.sex);
+	public String getGenderName() {
+		AnimalGender genderName = AnimalGender.fromDescription(this.gender);
 
-		if (sexName != null) {
-			return sexName.name();
+		if (genderName != null) {
+			return genderName.name();
 		}
 
 		return null;

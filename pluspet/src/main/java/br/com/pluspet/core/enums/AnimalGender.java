@@ -3,13 +3,13 @@ package br.com.pluspet.core.enums;
 import java.util.ArrayList;
 import java.util.List;
 
-public enum AnimalSex {
+public enum AnimalGender {
 
 	MALE("Masculino"), FEMALE("Feminino");
 
 	private String description;
 
-	private AnimalSex(String description) {
+	private AnimalGender(String description) {
 		this.description = description;
 	}
 
@@ -17,8 +17,8 @@ public enum AnimalSex {
 		return description;
 	}
 
-	public static AnimalSex fromDescription(String description) {
-		for (AnimalSex status : values()) {
+	public static AnimalGender fromDescription(String description) {
+		for (AnimalGender status : values()) {
 			if (status.description.equals(description)) {
 				return status;
 			}
@@ -29,7 +29,7 @@ public enum AnimalSex {
 	public static List<String> getAllTypes() {
 		List<String> types = new ArrayList<String>();
 
-		for (AnimalSex type : values()) {
+		for (AnimalGender type : values()) {
 			types.add(type.description);
 		}
 

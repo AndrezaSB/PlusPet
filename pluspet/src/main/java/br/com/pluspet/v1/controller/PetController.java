@@ -61,12 +61,11 @@ public class PetController {
 	@GetMapping("/active")
 	public ResponseEntity<Page<Pet>> listAllActive(@RequestParam(required = false) String name,
 			@RequestParam(required = false) String tutorName, @RequestParam(required = false) String spieces,
-			@RequestParam(required = false) String sex, @PageableDefault(size = 10, page = 0, sort = {
+			@RequestParam(required = false) String gender, @PageableDefault(size = 10, page = 0, sort = {
 					"name" }, direction = Sort.Direction.ASC) Pageable pageable) {
 
-		return ResponseEntity.ok(service
-				.findActives(PetFilter.builder().name(name).tutorName(tutorName).spieces(spieces).sex(sex).build(),
-						pageable)
+		return ResponseEntity.ok(service.findActives(
+				PetFilter.builder().name(name).tutorName(tutorName).spieces(spieces).gender(gender).build(), pageable)
 				.map(pet -> mapper.map(pet, Pet.class)));
 
 	}
@@ -122,7 +121,7 @@ public class PetController {
 			petEntity.get().setBreed(pet.getBreed());
 			petEntity.get().setName(pet.getName());
 			petEntity.get().setSpieces(null);
-//			petEntity.get().setSex(pet.getSex());
+			petEntity.get().setGender(pet.getGender());
 
 		} else {
 			throw new EntityNotFoundException();

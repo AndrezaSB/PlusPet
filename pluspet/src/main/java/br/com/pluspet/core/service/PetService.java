@@ -24,7 +24,7 @@ public class PetService extends AbstractService<Pet, UUID, PetRepository> {
 	}
 
 	public Page<Pet> findActives(PetFilter filter, Pageable pageable) {
-		return repository.findAllByFilter(false, filter.getName(), filter.getSpieces(), filter.getSexName(),
+		return repository.findAllByFilter(false, filter.getName(), filter.getSpieces(), filter.getGenderName(),
 				filter.getTutorName(), pageable);
 	}
 
