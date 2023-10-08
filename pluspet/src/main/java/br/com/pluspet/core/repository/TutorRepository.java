@@ -19,7 +19,12 @@ public interface TutorRepository extends JpaRepository<Tutor, UUID> {
 
 	public Optional<Tutor> findByIdAndArchivedFalse(UUID tutorId);
 
-	@Query(value = "SELECT t.* FROM tutor t WHERE t.archived = ?1 ORDER BY ?#{#pageable}", countQuery = "SELECT count(*) FROM tutor t WHERE t.archived = ?1", nativeQuery = true)
-	public Page<Tutor> findByArchived(Boolean archived, Pageable pageable);
+	@Query(value = "SELECT t.* FROM tutor t WHERE (?1 IS NULL OR t.archived = COALESCE(?1, NULL)) "
+			+ "AND (LOWER(t.name) LIKE LOWER(CONCAT('%', COALESCE(?2, '%'), '%'))) AND (LOWER(t.cpf) LIKE LOWER(CONCAT('%', COALESCE(?3, '%'), '%'))) "
+			+ "AND (LOWER(t.email) LIKE LOWER(CONCAT('%', COALESCE(?4, '%'), '%'))) "
+			+ "ORDER BY ?#{#pageable}", countQuery = "SELECT count(*) FROM tutor t WHERE (?1 IS NULL OR t.archived = COALESCE(?1, NULL)) "
+					+ "AND (LOWER(t.name) LIKE LOWER(CONCAT('%', COALESCE(?2, '%'), '%'))) AND (LOWER(t.cpf) LIKE LOWER(CONCAT('%', COALESCE(?3, '%'), '%'))) "
+					+ "AND (LOWER(t.email) LIKE LOWER(CONCAT('%', COALESCE(?4, '%'), '%')))", nativeQuery = true)
+	public Page<Tutor> findAllByFilter(Boolean archived, String name, String cpf, String email, Pageable pageable);
 
 }

@@ -5,10 +5,12 @@ import java.util.UUID;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import br.com.pluspet.core.enums.AnimalSex;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -36,9 +38,14 @@ public class Pet {
 	@Column(name = "birth_date")
 	private LocalDate birthDate;
 
-	@Column(name = "type")
-	@NotBlank(message = "Tipo de animal {jakarta.validation.constraints.NotBlank.message}")
-	private String type;
+	@Column(name = "spieces")
+	@NotBlank(message = "Espécie {jakarta.validation.constraints.NotBlank.message}")
+	private String spieces;
+
+	@Column(name = "sex")
+	@NotNull(message = "Sexo {jakarta.validation.constraints.NotNull.message}")
+	@Enumerated(EnumType.STRING)
+	private AnimalSex sex;
 
 	@Column(name = "breed")
 	@NotBlank(message = "Raça {jakarta.validation.constraints.NotBlank.message}")
@@ -52,4 +59,23 @@ public class Pet {
 	@JoinColumn(name = "tutor")
 	@NotNull(message = "Tutor {jakarta.validation.constraints.NotNull.message}")
 	private Tutor tutor;
+
+//	@Transient
+//	private String animalSex;
+//
+//	@PostLoad
+//	private void fillTransient() {
+//		if (sex != null) {
+//			this.animalSex = sex.getDescription();
+//		}
+//	}
+//
+//	@PrePersist
+//	private void fillPersistentValues() {
+//		if (animalSex != null) {
+//			this.sex = AnimalSex.fromDescription(animalSex);
+//		} else {
+//			this.sex = null;
+//		}
+//	}
 }

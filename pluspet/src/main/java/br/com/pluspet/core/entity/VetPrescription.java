@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,10 +28,15 @@ public class VetPrescription {
 	@Column(name = "id", columnDefinition = "uuid", insertable = true, updatable = false, nullable = false)
 	private UUID id;
 	
+	@ManyToOne(cascade = CascadeType.MERGE)
+	@JoinColumn(name = "veterinarian")
+	@NotNull(message = "Veterinário {jakarta.validation.constraints.NotNull.message}")
+	private Veterinarian veterinarian;
+
 	@ManyToOne
 	@JoinColumn(name = "appointment")
 	@NotNull(message = "Consulta {jakarta.validation.constraints.NotNull.message}")
-	private VetAppointment appointment;
+	private Appointment appointment;
 
 	@OneToMany(mappedBy = "prescription")
 	@NotNull(message = "Medicamentos {jakarta.validation.constraints.NotNull.message}")

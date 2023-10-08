@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.pluspet.core.entity.Pet;
 import br.com.pluspet.core.repository.PetRepository;
+import br.com.pluspet.core.vo.PetFilter;
 
 @Service
 public class PetService extends AbstractService<Pet, UUID, PetRepository> {
@@ -22,8 +23,9 @@ public class PetService extends AbstractService<Pet, UUID, PetRepository> {
 		return repository.findByIdAndArchivedFalse(petId);
 	}
 
-	public Page<Pet> findActives(Pageable pageable) {
-		return repository.findByArchived(false, pageable);
+	public Page<Pet> findActives(PetFilter filter, Pageable pageable) {
+		return repository.findAllByFilter(false, filter.getName(), filter.getSpieces(), filter.getSexName(),
+				filter.getTutorName(), pageable);
 	}
 
 	public Pet savePet(Pet pet) {

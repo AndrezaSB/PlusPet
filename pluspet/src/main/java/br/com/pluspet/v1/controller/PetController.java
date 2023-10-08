@@ -1,6 +1,10 @@
 package br.com.pluspet.v1.controller;
 
+import static java.util.stream.Collectors.toList;
+
 import java.net.URI;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,11 +21,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.com.pluspet.core.service.PetService;
 import br.com.pluspet.core.service.TutorService;
+import br.com.pluspet.core.vo.PetFilter;
 import br.com.pluspet.v1.dto.Pet;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -40,16 +46,28 @@ public class PetController {
 	private ModelMapper mapper;
 
 	@GetMapping
-	public ResponseEntity<Page<Pet>> listAll(@PageableDefault(size = 10, page = 0, sort = {
-			"name" }, direction = Sort.Direction.ASC) Pageable pageable) {
-		return ResponseEntity.ok(service.findAll(pageable).map(pet -> mapper.map(pet, Pet.class)));
+	public ResponseEntity<List<Pet>> listAll() {
+		List<Pet> pets = Optional.ofNullable(service.findAll()).orElseGet(Collections::emptyList).stream()
+				.map(pet -> mapper.map(pet, Pet.class)).collect(toList());
+
+		if (pets.isEmpty()) {
+			throw new EntityNotFoundException();
+		} else {
+			return ResponseEntity.ok(pets);
+		}
 
 	}
 
 	@GetMapping("/active")
-	public ResponseEntity<Page<Pet>> listAllActive(@PageableDefault(size = 10, page = 0, sort = {
-			"name" }, direction = Sort.Direction.ASC) Pageable pageable) {
-		return ResponseEntity.ok(service.findActives(pageable).map(pet -> mapper.map(pet, Pet.class)));
+	public ResponseEntity<Page<Pet>> listAllActive(@RequestParam(required = false) String name,
+			@RequestParam(required = false) String tutorName, @RequestParam(required = false) String spieces,
+			@RequestParam(required = false) String sex, @PageableDefault(size = 10, page = 0, sort = {
+					"name" }, direction = Sort.Direction.ASC) Pageable pageable) {
+
+		return ResponseEntity.ok(service
+				.findActives(PetFilter.builder().name(name).tutorName(tutorName).spieces(spieces).sex(sex).build(),
+						pageable)
+				.map(pet -> mapper.map(pet, Pet.class)));
 
 	}
 
@@ -69,7 +87,9 @@ public class PetController {
 		savePet.setTutor(Optional.ofNullable(tutorService.findById(pet.getTutor().getId()))
 				.map(tutorEntity -> tutorEntity.get()).orElseThrow(EntityNotFoundException::new));
 
-		Pet savedDTO = mapper.map(service.savePet(savePet), Pet.class);
+		br.com.pluspet.core.entity.Pet test = service.savePet(savePet);
+
+		Pet savedDTO = mapper.map(test, Pet.class);
 
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedDTO.getId())
 				.toUri();
@@ -101,7 +121,8 @@ public class PetController {
 			petEntity.get().setBirthDate(pet.getBirthDate());
 			petEntity.get().setBreed(pet.getBreed());
 			petEntity.get().setName(pet.getName());
-			petEntity.get().setType(pet.getType());
+			petEntity.get().setSpieces(null);
+//			petEntity.get().setSex(pet.getSex());
 
 		} else {
 			throw new EntityNotFoundException();

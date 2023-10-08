@@ -44,30 +44,30 @@ public class StatusHistory {
 	private Employee employee;
 
 	@ManyToOne
-	@JoinColumn(name = "service")
-	@NotNull(message = "Serviço {jakarta.validation.constraints.NotNull.message}")
-	private Service service;
+	@JoinColumn(name = "appointment")
+	@NotNull(message = "Atendimento {jakarta.validation.constraints.NotNull.message}")
+	private Appointment appointment;
 
 	@Column(name = "status")
 	@NotNull(message = "Status {jakarta.validation.constraints.NotNull.message}")
-	private Integer statusValue;
+	private Integer status;
 
 	@Transient
-	private Status status;
+	private Status currentStatus;
 
 	@PostLoad
 	private void fillTransientStatus() {
-		if (statusValue > 0) {
-			this.status = Status.fromCode(statusValue);
+		if (status > 0) {
+			this.currentStatus = Status.fromCode(status);
 		}
 	}
 
 	@PrePersist
 	private void fillPersistentStatusValue() {
-		if (status != null) {
-			this.statusValue = status.getCode();
+		if (currentStatus != null) {
+			this.status = currentStatus.getCode();
 		} else {
-			this.statusValue = null;
+			this.status = null;
 		}
 	}
 

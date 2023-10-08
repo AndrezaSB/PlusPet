@@ -2,8 +2,8 @@ package br.com.pluspet.core.enums;
 
 public enum Status {
 
-	AGUARDANDO_ATENDIMENTO(1, "Aguardando Atendimento"), EM_ATENDIMENTO(2, "Em Atendimento"),
-	FINALIZADO(3, "Finalizado"), CANCELADO(4, "Cancelado");
+	WAITING_SERVICE(1, "Aguardando Atendimento"), IN_PROGRESS(2, "Em Atendimento"), FINISHED(3, "Finalizado"),
+	CANCEL(4, "Cancelado");
 
 	private Integer code;
 	private String description;

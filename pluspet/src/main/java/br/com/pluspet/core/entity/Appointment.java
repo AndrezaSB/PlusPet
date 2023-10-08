@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import br.com.pluspet.core.enums.AppointmentType;
 import br.com.pluspet.core.enums.Status;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -23,9 +24,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Entity
-@Table(name = "service")
+@Table(name = "appointment")
 @Data
-public class Service {
+public class Appointment {
 
 	@Id
 	@GeneratedValue(generator = "UUID")
@@ -47,16 +48,21 @@ public class Service {
 	@Column(name = "comment")
 	private String comment;
 
-	@OneToMany(mappedBy = "service", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "appointment", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<StatusHistory> statusHistory = new ArrayList<StatusHistory>();
+
+	@Transient
+	private AppointmentType appointmentType;
 
 	@Transient
 	private Status actualStatus;
 
 	@PostLoad
-	private void fillTransientStatus() {
+	private void fillTransients() {
 		if (statusHistory.size() > 0) {
-			this.actualStatus = Status.fromCode(statusHistory.get(statusHistory.size() - 1).getStatusValue());
+			this.actualStatus = Status.fromCode(statusHistory.get(statusHistory.size() - 1).getStatus());
 		}
+
+		this.appointmentType = AppointmentType.fromDescription(type);
 	}
 }

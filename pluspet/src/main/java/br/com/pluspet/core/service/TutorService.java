@@ -12,6 +12,7 @@ import br.com.pluspet.core.entity.Address;
 import br.com.pluspet.core.entity.Telephone;
 import br.com.pluspet.core.entity.Tutor;
 import br.com.pluspet.core.repository.TutorRepository;
+import br.com.pluspet.core.vo.TutorFilter;
 
 @Service
 public class TutorService extends AbstractService<Tutor, UUID, TutorRepository> {
@@ -24,8 +25,8 @@ public class TutorService extends AbstractService<Tutor, UUID, TutorRepository> 
 		return repository.findByIdAndArchivedFalse(tutorId);
 	}
 
-	public Page<Tutor> findActives(Pageable pageable) {
-		return repository.findByArchived(false, pageable);
+	public Page<Tutor> findActives(TutorFilter filter, Pageable pageable) {
+		return repository.findAllByFilter(false, filter.getName(), filter.getCpf(), filter.getEmail(), pageable);
 	}
 
 	public Tutor saveTutor(Tutor tutor) {

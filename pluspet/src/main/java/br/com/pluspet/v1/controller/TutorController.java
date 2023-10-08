@@ -1,6 +1,10 @@
 package br.com.pluspet.v1.controller;
 
+import static java.util.stream.Collectors.toList;
+
 import java.net.URI;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,11 +21,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.com.pluspet.core.service.PetService;
 import br.com.pluspet.core.service.TutorService;
+import br.com.pluspet.core.vo.TutorFilter;
 import br.com.pluspet.v1.dto.Tutor;
 import br.com.pluspet.v1.dto.TutorBasicInfo;
 import jakarta.persistence.EntityNotFoundException;
@@ -41,18 +47,25 @@ public class TutorController {
 	private ModelMapper mapper;
 
 	@GetMapping
-	public ResponseEntity<Page<TutorBasicInfo>> listAll(@PageableDefault(size = 10, page = 0, sort = {
-			"name" }, direction = Sort.Direction.ASC) Pageable pageable) {
-		return ResponseEntity.ok(tutorService.findAll(pageable).map(tutor -> mapper.map(tutor, TutorBasicInfo.class)));
+	public ResponseEntity<List<TutorBasicInfo>> listAll() {
+		List<TutorBasicInfo> tutors = Optional.ofNullable(tutorService.findAll()).orElseGet(Collections::emptyList)
+				.stream().map(tutor -> mapper.map(tutor, TutorBasicInfo.class)).collect(toList());
 
+		if (tutors.isEmpty()) {
+			throw new EntityNotFoundException();
+		} else {
+			return ResponseEntity.ok(tutors);
+		}
 	}
 
 	@GetMapping("/active")
-	public ResponseEntity<Page<TutorBasicInfo>> listAllActive(@PageableDefault(size = 10, page = 0, sort = {
-			"name" }, direction = Sort.Direction.ASC) Pageable pageable) {
-
+	public ResponseEntity<Page<TutorBasicInfo>> listAllActive(@RequestParam(required = false) String name,
+			@RequestParam(required = false) String cpf, @RequestParam(required = false) String email,
+			@PageableDefault(size = 10, page = 0, sort = {
+					"name" }, direction = Sort.Direction.ASC) Pageable pageable) {
 		return ResponseEntity
-				.ok(tutorService.findActives(pageable).map(tutor -> mapper.map(tutor, TutorBasicInfo.class)));
+				.ok(tutorService.findActives(TutorFilter.builder().name(name).cpf(cpf).email(email).build(), pageable)
+						.map(tutor -> mapper.map(tutor, TutorBasicInfo.class)));
 
 	}
 
