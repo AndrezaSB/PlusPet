@@ -1,10 +1,6 @@
 package br.com.pluspet.v1.controller;
 
-import static java.util.stream.Collectors.toList;
-
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,8 +23,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import br.com.pluspet.core.service.PetService;
 import br.com.pluspet.core.service.TutorService;
 import br.com.pluspet.v1.dto.Pet;
-import br.com.pluspet.v1.dto.TutorBasicInfo;
-import br.com.pluspet.v1.validation.BasicInfo;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 

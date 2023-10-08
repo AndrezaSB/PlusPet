@@ -1,10 +1,6 @@
 package br.com.pluspet.v1.controller;
 
-import static java.util.stream.Collectors.toList;
-
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,9 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import br.com.pluspet.core.entity.Address;
-import br.com.pluspet.core.entity.Telephone;
-import br.com.pluspet.core.repository.TutorRepository;
 import br.com.pluspet.core.service.PetService;
 import br.com.pluspet.core.service.TutorService;
 import br.com.pluspet.v1.dto.Tutor;
@@ -40,9 +33,6 @@ public class TutorController {
 
 	@Autowired
 	private TutorService tutorService;
-
-	@Autowired
-	private TutorRepository repository;
 
 	@Autowired
 	private PetService petService;
@@ -103,42 +93,14 @@ public class TutorController {
 
 	@PutMapping("/{id}")
 	public ResponseEntity<Tutor> editTutor(@PathVariable("id") UUID tutorId, @Valid @RequestBody Tutor tutor) {
-		Optional<br.com.pluspet.core.entity.Tutor> tutorEntity = tutorService.findByIdActive(tutorId);
 
-		if (tutorEntity.isPresent()) {
+		br.com.pluspet.core.entity.Tutor tutorEntity = mapper.map(tutor, br.com.pluspet.core.entity.Tutor.class);
+		tutorEntity.setId(tutorId);
 
-			tutorEntity.get().setBirthDate(tutor.getBirthDate());
-			tutorEntity.get().setCpf(tutor.getCpf());
-			tutorEntity.get().setEmail(tutor.getEmail());
-			tutorEntity.get().setName(tutor.getName());
+		Tutor updatedTutor = mapper.map(tutorService.updateTutor(tutorEntity), Tutor.class);
 
-			List<Address> addressesEntities = Optional.ofNullable(tutor.getAddresses())
-					.orElseGet(Collections::emptyList).stream().map(address -> mapper.map(address, Address.class))
-					.collect(toList());
-
-			for (Address address : addressesEntities) {
-				address.setTutor(tutorEntity.get());
-			}
-			tutorEntity.get().getAddresses().clear();
-
-			tutorEntity.get().getAddresses().addAll(addressesEntities);
-
-			List<Telephone> telephonesEntities = Optional.ofNullable(tutor.getTelephones())
-					.orElseGet(Collections::emptyList).stream().map(telephone -> mapper.map(telephone, Telephone.class))
-					.collect(toList());
-
-			for (Telephone telephone : telephonesEntities) {
-				telephone.setTutor(tutorEntity.get());
-			}
-
-			tutorEntity.get().getTelephones().clear();
-
-			tutorEntity.get().getTelephones().addAll(telephonesEntities);
-		} else {
-			throw new EntityNotFoundException();
-		}
-
-		return ResponseEntity.ok(mapper.map(tutorService.saveTutor(tutorEntity.get()), Tutor.class));
+		return Optional.ofNullable(updatedTutor).map(tutorResponse -> ResponseEntity.ok(tutorResponse))
+				.orElseThrow(EntityNotFoundException::new);
 	}
 
 }
