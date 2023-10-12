@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,12 +26,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.com.pluspet.core.entity.Pet;
 import br.com.pluspet.core.enums.AppointmentType;
+import br.com.pluspet.core.enums.Status;
 import br.com.pluspet.core.service.AppointmentService;
 import br.com.pluspet.core.service.PetService;
 import br.com.pluspet.core.vo.AppointmentFilter;
 import br.com.pluspet.v1.dto.Appointment;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/v1/appointment")
@@ -91,6 +95,23 @@ public class AppointmentController {
 				.toUri();
 
 		return ResponseEntity.created(location).body(savedDTO);
+
+	}
+
+	@PutMapping("/{id}/status")
+	public ResponseEntity<Appointment> saveAppointment(@PathVariable("id") UUID appointmentId,
+			@RequestBody Status status) {
+
+		Optional.ofNullable(status).orElseThrow(EntityNotFoundException::new);
+
+		Optional<br.com.pluspet.core.entity.Appointment> appointment = service
+				.updateAppointmentStatusHistory(appointmentId, status);
+
+		if (!appointment.isPresent()) {
+			throw new EntityNotFoundException();
+		}
+
+		return ResponseEntity.ok(mapper.map(appointment.get(), Appointment.class));
 
 	}
 

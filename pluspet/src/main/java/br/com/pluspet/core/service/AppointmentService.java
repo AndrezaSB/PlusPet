@@ -17,12 +17,13 @@ import br.com.pluspet.core.enums.Status;
 import br.com.pluspet.core.repository.AppointmentRepository;
 import br.com.pluspet.core.repository.StatusHistoryRepository;
 import br.com.pluspet.core.vo.AppointmentFilter;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class AppointmentService extends AbstractService<Appointment, UUID, AppointmentRepository> {
 
 	@Autowired
-	protected StatusHistoryRepository statusRepository;
+	protected StatusHistoryService statusService;
 
 	@Transactional(propagation = Propagation.REQUIRED)
 	public Optional<Appointment> findById(UUID appointmentId) {
@@ -35,6 +36,7 @@ public class AppointmentService extends AbstractService<Appointment, UUID, Appoi
 		return appointment;
 	}
 
+	@Transactional(propagation = Propagation.REQUIRED)
 	public Appointment saveAppointment(Appointment appointment) {
 		return repository.save(appointment);
 	}
@@ -43,21 +45,12 @@ public class AppointmentService extends AbstractService<Appointment, UUID, Appoi
 	public Appointment createAppointment(Appointment appointment) {
 
 		Appointment savedAppointment = repository.save(appointment);
-
-		if (appointment != null) {
-			StatusHistory newStatus = new StatusHistory();
-			newStatus.setAppointment(savedAppointment);
-			newStatus.setDate(LocalDateTime.now());
-			newStatus.setStatus(Status.WAITING_SERVICE);
-
-			StatusHistory status = statusRepository.save(newStatus);
-
-			savedAppointment.setStatus(status.getStatus());
-		}
+		savedAppointment.setStatus(statusService.createStatusHistory(savedAppointment).getStatus());
 
 		return savedAppointment;
 	}
 
+	@Transactional(propagation = Propagation.REQUIRED)
 	public Page<Appointment> findAll(AppointmentFilter filter, Pageable pageable) {
 		Page<Appointment> appointments = repository.findAllByFilter(filter.getDate(), filter.getAppointmentType(),
 				filter.getPetName(), filter.getTutorName(), pageable);
@@ -71,8 +64,20 @@ public class AppointmentService extends AbstractService<Appointment, UUID, Appoi
 		return appointments;
 	}
 
+	@Transactional(propagation = Propagation.REQUIRED)
+	public Optional<Appointment> updateAppointmentStatusHistory(UUID appointmentId, Status status) {
+		Optional<br.com.pluspet.core.entity.Appointment> appointment = repository.findById(appointmentId);
+
+		if (appointment.isPresent()) {
+			appointment.get().setStatus(statusService.updateStatusHistory(appointment.get(), status).getStatus());
+		}
+
+		return appointment;
+	}
+
+	@Transactional(propagation = Propagation.REQUIRED)
 	private Status getCurrentStatus(UUID appointmentId) {
-		Optional<StatusHistory> history = statusRepository.findFirstByAppointmentIdOrderByIdDesc(appointmentId);
+		Optional<StatusHistory> history = statusService.findAppointmentsActualStatus(appointmentId);
 
 		if (history.isPresent()) {
 			return history.get().getStatus();
