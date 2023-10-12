@@ -1,8 +1,6 @@
 package br.com.pluspet.core.entity;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.GenericGenerator;
@@ -12,14 +10,15 @@ import br.com.pluspet.core.enums.Status;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PostLoad;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -35,11 +34,12 @@ public class Appointment {
 	private UUID id;
 
 	@Column(name = "type")
-	@NotBlank(message = "Tipo de serviço {jakarta.validation.constraints.NotBlank.message}")
-	private String type;
+	@NotNull(message = "Tipo de serviço {jakarta.validation.constraints.NotNull.message}")
+	@Enumerated(EnumType.STRING)
+	private AppointmentType appointmentType;
 
 	@Column(name = "date")
-	@NotNull(message = "Data de atendimento {jakarta.validation.constraints.@NotNull.message}")
+	@NotNull(message = "Data de atendimento {jakarta.validation.constraints.NotNull.message}")
 	private LocalDate date;
 
 	@Column(name = "additional_details")
@@ -48,21 +48,12 @@ public class Appointment {
 	@Column(name = "comment")
 	private String comment;
 
-	@OneToMany(mappedBy = "appointment", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	private List<StatusHistory> statusHistory = new ArrayList<StatusHistory>();
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+	@JoinColumn(name = "pet")
+	@NotNull(message = "Pet {jakarta.validation.constraints.NotNull.message}")
+	private Pet pet;
 
 	@Transient
-	private AppointmentType appointmentType;
+	private Status status;
 
-	@Transient
-	private Status actualStatus;
-
-	@PostLoad
-	private void fillTransients() {
-		if (statusHistory.size() > 0) {
-			this.actualStatus = Status.fromCode(statusHistory.get(statusHistory.size() - 1).getStatus());
-		}
-
-		this.appointmentType = AppointmentType.fromDescription(type);
-	}
 }

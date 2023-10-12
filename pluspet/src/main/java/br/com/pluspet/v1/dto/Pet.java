@@ -3,11 +3,9 @@ package br.com.pluspet.v1.dto;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
-import br.com.pluspet.core.enums.AnimalGender;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -28,7 +26,7 @@ public class Pet {
 	private String spieces;
 
 	@NotNull(message = "Sexo {jakarta.validation.constraints.NotBlank.message}")
-	private String animalGender;
+	private String gender;
 
 	@NotBlank(message = "Raça {jakarta.validation.constraints.NotBlank.message}")
 	private String breed;
@@ -39,13 +37,4 @@ public class Pet {
 	@NotNull(message = "Tutor {jakarta.validation.constraints.NotNull.message}")
 	private @Valid TutorBasicInfo tutor;
 
-	@JsonIgnore
-	public AnimalGender getGender() {
-		return AnimalGender.fromDescription(animalGender);
-	}
-
-	@JsonIgnore
-	public void setGender(AnimalGender animalGenderEnum) {
-		this.animalGender = animalGenderEnum.getDescription();
-	}
 }

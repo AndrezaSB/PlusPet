@@ -6,7 +6,7 @@ import java.util.List;
 public enum AppointmentType {
 
 	BATH("Banho"), BATH_GROOMING("Banho & Tosa"), MEDICAL_APPOINTMENT("Consulta Veterinária"),
-	MEDICAL_RETURN("Retorno consulta");
+	MEDICAL_RETURN("Retorno Consulta");
 
 	private String description;
 

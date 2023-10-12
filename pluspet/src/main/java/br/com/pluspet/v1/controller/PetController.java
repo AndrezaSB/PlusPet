@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import br.com.pluspet.core.enums.AnimalGender;
 import br.com.pluspet.core.service.PetService;
 import br.com.pluspet.core.service.TutorService;
 import br.com.pluspet.core.vo.PetFilter;
@@ -121,7 +122,7 @@ public class PetController {
 			petEntity.get().setBreed(pet.getBreed());
 			petEntity.get().setName(pet.getName());
 			petEntity.get().setSpieces(null);
-			petEntity.get().setGender(pet.getGender());
+			petEntity.get().setGender(AnimalGender.fromDescription(pet.getGender()));
 
 		} else {
 			throw new EntityNotFoundException();

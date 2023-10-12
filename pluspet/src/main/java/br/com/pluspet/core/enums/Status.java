@@ -2,32 +2,17 @@ package br.com.pluspet.core.enums;
 
 public enum Status {
 
-	WAITING_SERVICE(1, "Aguardando Atendimento"), IN_PROGRESS(2, "Em Atendimento"), FINISHED(3, "Finalizado"),
-	CANCEL(4, "Cancelado");
+	WAITING_SERVICE("Aguardando Atendimento"), IN_PROGRESS("Em Atendimento"), FINISHED("Finalizado"),
+	CANCEL("Cancelado");
 
-	private Integer code;
 	private String description;
 
-	private Status(Integer code, String description) {
-		this.code = code;
+	private Status(String description) {
 		this.description = description;
-	}
-
-	public Integer getCode() {
-		return code;
 	}
 
 	public String getDescription() {
 		return description;
-	}
-
-	public static Status fromCode(Integer code) {
-		for (Status status : values()) {
-			if (status.code.equals(code)) {
-				return status;
-			}
-		}
-		return null;
 	}
 
 	public static Status fromDescription(String description) {
