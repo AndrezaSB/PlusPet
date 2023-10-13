@@ -28,8 +28,9 @@ public class SecurityConfiguration {
 	@Autowired
 	private SecurityFilter securityFilter;
 
-	private static final String[] AUTH_WHITELIST = { "/v3/**", "/auth/**", "/swagger-ui.html", "/swagger-ui/**",
-			"/h2-concole/**" };
+	private static final String[] AUTH_WHITELIST = { "/api/v1/auth/**", "/v2/api-docs", "/v3/api-docs",
+			"/v3/api-docs/**", "/auth/**", "/swagger-ui.html", "/swagger-ui/**", "/swagger-resources/",
+			"/swagger-resources/**", "/configuration/ui", "/configuration/security", "/webjars/**" };
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {

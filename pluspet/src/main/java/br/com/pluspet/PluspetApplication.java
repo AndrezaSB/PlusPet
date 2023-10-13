@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 
 @SpringBootApplication
-@OpenAPIDefinition(info = @Info(title = "PlusPet API", version = "1.0"))
 public class PluspetApplication {
 
 	public static void main(String[] args) {
