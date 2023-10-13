@@ -1,10 +1,14 @@
 package br.com.pluspet.v1.controller;
 
+import static java.util.stream.Collectors.toList;
+
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +30,11 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.com.pluspet.core.entity.Pet;
 import br.com.pluspet.core.enums.AppointmentType;
+import br.com.pluspet.core.enums.Role;
 import br.com.pluspet.core.enums.Status;
 import br.com.pluspet.core.service.AppointmentService;
 import br.com.pluspet.core.service.PetService;
+import br.com.pluspet.core.util.AppointmentTypeUtil;
 import br.com.pluspet.core.vo.AppointmentFilter;
 import br.com.pluspet.core.entity.Employee;
 import br.com.pluspet.v1.dto.Appointment;
@@ -64,8 +70,11 @@ public class AppointmentController {
 			appointmentDate = LocalDate.now();
 		}
 
+		List<String> allowedTypes = AppointmentTypeUtil.getAllowedAppointmentsTypes(employee.getRole()).stream()
+				.map(type -> type.name()).collect(toList());
+
 		AppointmentFilter filter = AppointmentFilter.builder().petName(petName).tutorName(tutorName)
-				.appointmentType(appointmentType).date(appointmentDate).build();
+				.appointmentType(appointmentType).allowedTypes(allowedTypes).date(appointmentDate).build();
 
 		return ResponseEntity
 				.ok(service.findAll(filter, pageable).map(appointment -> mapper.map(appointment, Appointment.class)));

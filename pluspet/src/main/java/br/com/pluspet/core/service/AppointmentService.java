@@ -50,7 +50,7 @@ public class AppointmentService extends AbstractService<Appointment, UUID, Appoi
 	@Transactional(propagation = Propagation.REQUIRED)
 	public Page<Appointment> findAll(AppointmentFilter filter, Pageable pageable) {
 		Page<Appointment> appointments = repository.findAllByFilter(filter.getDate(), filter.getAppointmentType(),
-				filter.getPetName(), filter.getTutorName(), pageable);
+				filter.getAllowedTypes(), filter.getPetName(), filter.getTutorName(), pageable);
 
 		if (appointments != null) {
 			for (Appointment appointment : appointments) {
