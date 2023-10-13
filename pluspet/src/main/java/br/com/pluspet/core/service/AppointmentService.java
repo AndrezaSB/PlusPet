@@ -1,6 +1,5 @@
 package br.com.pluspet.core.service;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,9 +14,7 @@ import br.com.pluspet.core.entity.Appointment;
 import br.com.pluspet.core.entity.StatusHistory;
 import br.com.pluspet.core.enums.Status;
 import br.com.pluspet.core.repository.AppointmentRepository;
-import br.com.pluspet.core.repository.StatusHistoryRepository;
 import br.com.pluspet.core.vo.AppointmentFilter;
-import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class AppointmentService extends AbstractService<Appointment, UUID, AppointmentRepository> {
