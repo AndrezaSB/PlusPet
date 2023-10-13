@@ -16,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import br.com.pluspet.api.security.SecurityFilter;
+import br.com.pluspet.core.enums.Role;
 
 @Configuration
 @EnableWebSecurity
@@ -31,7 +32,13 @@ public class SecurityConfiguration {
 		return httpSecurity.csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(authorize -> authorize.requestMatchers(AUTH_WHITELIST).permitAll()
-						.requestMatchers(HttpMethod.POST, "/auth/login").permitAll().anyRequest().authenticated())
+						.requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+						.requestMatchers(HttpMethod.POST, "/v1/appointment").hasRole("ATTENDANT")
+						.requestMatchers(HttpMethod.POST, "/v1/pet").hasRole("ATTENDANT")
+						.requestMatchers(HttpMethod.PUT, "/v1/pet/**").hasRole("ATTENDANT")
+						.requestMatchers(HttpMethod.POST, "/v1/tutor").hasRole("ATTENDANT")
+						.requestMatchers(HttpMethod.PUT, "/v1/tutor/**").hasRole("ATTENDANT").anyRequest()
+						.authenticated())
 				.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
 	}
 

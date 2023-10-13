@@ -16,8 +16,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,9 +23,8 @@ import lombok.Data;
 
 @Entity
 @Table(name = "employee")
-@Inheritance(strategy = InheritanceType.JOINED)
 @Data
-public abstract class Employee implements UserDetails {
+public class Employee implements UserDetails {
 
 	/**
 	 * 
@@ -51,6 +48,9 @@ public abstract class Employee implements UserDetails {
 	@Column(name = "password", nullable = false)
 	@NotBlank(message = "Password {jakarta.validation.constraints.NotBlank.message}")
 	private String password;
+
+	@Column(name = "crmv")
+	private String CRMV;
 
 	@Column(name = "role", nullable = false)
 	@NotNull(message = "Role {jakarta.validation.constraints.NotNull.message}")

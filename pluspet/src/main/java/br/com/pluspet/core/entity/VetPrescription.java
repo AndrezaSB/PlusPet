@@ -27,11 +27,11 @@ public class VetPrescription {
 	@GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
 	@Column(name = "id", columnDefinition = "uuid", insertable = true, updatable = false, nullable = false)
 	private UUID id;
-	
+
 	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name = "veterinarian")
 	@NotNull(message = "Veterinário {jakarta.validation.constraints.NotNull.message}")
-	private Veterinarian veterinarian;
+	private Employee veterinarian;
 
 	@ManyToOne
 	@JoinColumn(name = "appointment")

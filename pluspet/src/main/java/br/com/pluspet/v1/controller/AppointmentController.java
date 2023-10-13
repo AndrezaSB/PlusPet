@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +30,7 @@ import br.com.pluspet.core.enums.Status;
 import br.com.pluspet.core.service.AppointmentService;
 import br.com.pluspet.core.service.PetService;
 import br.com.pluspet.core.vo.AppointmentFilter;
+import br.com.pluspet.core.entity.Employee;
 import br.com.pluspet.v1.dto.Appointment;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -52,8 +54,9 @@ public class AppointmentController {
 	}
 
 	@GetMapping("/")
-	public ResponseEntity<Page<Appointment>> listAll(@RequestParam(required = false) String petName,
-			@RequestParam(required = false) String tutorName, @RequestParam(required = false) String appointmentType,
+	public ResponseEntity<Page<Appointment>> listAll(@AuthenticationPrincipal Employee employee,
+			@RequestParam(required = false) String petName, @RequestParam(required = false) String tutorName,
+			@RequestParam(required = false) String appointmentType,
 			@RequestParam(required = true) LocalDate appointmentDate,
 			@PageableDefault(size = 10, page = 0, sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable) {
 
