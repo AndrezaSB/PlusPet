@@ -4,18 +4,25 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.pluspet.core.entity.Address;
 import br.com.pluspet.core.entity.Telephone;
 import br.com.pluspet.core.entity.Tutor;
 import br.com.pluspet.core.repository.TutorRepository;
 import br.com.pluspet.core.vo.TutorFilter;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class TutorService extends AbstractService<Tutor, UUID, TutorRepository> {
+
+	@Autowired
+	private PetService petService;
 
 	public Optional<Tutor> findById(UUID tutorId) {
 		return repository.findById(tutorId);
@@ -33,13 +40,15 @@ public class TutorService extends AbstractService<Tutor, UUID, TutorRepository> 
 		return repository.save(tutor);
 	}
 
+	@Transactional(propagation = Propagation.REQUIRED)
 	public Tutor archiveTutor(UUID tutorId) {
-		Optional<br.com.pluspet.core.entity.Tutor> tutor = this.findById(tutorId);
+		Optional<br.com.pluspet.core.entity.Tutor> tutor = this.findByIdActive(tutorId);
 
 		if (tutor.isPresent()) {
 			tutor.get().setArchived(true);
+			petService.archivePetsByTutor(tutorId);
 		} else {
-			return null;
+			throw new EntityNotFoundException();
 		}
 
 		return this.saveTutor(tutor.get());
@@ -77,6 +86,6 @@ public class TutorService extends AbstractService<Tutor, UUID, TutorRepository> 
 			return repository.save(tutorEntity.get());
 		}
 
-		return null;
+		throw new EntityNotFoundException();
 	}
 }

@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import br.com.pluspet.core.service.PetService;
 import br.com.pluspet.core.service.TutorService;
 import br.com.pluspet.core.vo.TutorFilter;
 import br.com.pluspet.v1.dto.Tutor;
@@ -39,9 +38,6 @@ public class TutorController {
 
 	@Autowired
 	private TutorService tutorService;
-
-	@Autowired
-	private PetService petService;
 
 	@Autowired
 	private ModelMapper mapper;
@@ -93,15 +89,11 @@ public class TutorController {
 
 	@PutMapping("/active/{id}")
 	public ResponseEntity<Tutor> archiveTutor(@PathVariable("id") UUID tutorId) {
-		br.com.pluspet.core.entity.Tutor tutor = tutorService.archiveTutor(tutorId);
 
-		if (tutor != null) {
-			petService.archivePetsByTutor(tutorId);
-		} else {
-			throw new EntityNotFoundException();
-		}
+		Tutor updatedTutor = mapper.map(tutorService.archiveTutor(tutorId), Tutor.class);
 
-		return ResponseEntity.ok(mapper.map(tutorService.saveTutor(tutor), Tutor.class));
+		return Optional.ofNullable(updatedTutor).map(tutorResponse -> ResponseEntity.ok(tutorResponse))
+				.orElseThrow(EntityNotFoundException::new);
 	}
 
 	@PutMapping("/{id}")

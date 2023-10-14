@@ -20,11 +20,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "appointment")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Appointment {
 
 	@Id

@@ -24,7 +24,10 @@ public class PlusPetExceptionHandler {
 	public ResponseEntity<ErrorMessage> error400(MethodArgumentNotValidException ex) {
 		Set<String> messages = ex.getBindingResult().getAllErrors().stream().map(err -> messageSource.getMessage(err))
 				.collect(toSet());
-		return ResponseEntity.badRequest().body(ErrorMessage.builder().message("Test").messages(messages).build());
+		return ResponseEntity.badRequest()
+				.body(ErrorMessage.builder()
+						.message("Não foi possível finalizar sua ação. Favor entrar em contato com o Administrador")
+						.messages(messages).build());
 	}
 
 	@ExceptionHandler(EntityNotFoundException.class)
@@ -34,12 +37,9 @@ public class PlusPetExceptionHandler {
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<ErrorMessage> manageError400(HttpMessageNotReadableException ex) {
-		return ResponseEntity.badRequest().body(ErrorMessage.builder().message("Test").build());
+		return ResponseEntity.badRequest().body(ErrorMessage.builder()
+				.message("Não foi possível finalizar sua ação. Favor entrar em contato com o Administrador").build());
 	}
-
-//@ExceptionHandler(MethodArgumentTypeMismatchException.class)
-//public ResponseEntity<ErrorMessage> tratarErro400ConversaoNumero(MethodArgumentTypeMismatchException ex) {
-//return ResponseEntity.badRequest().body(Erro.builder().mensagem(messageSource.getMessage("recnaoencontrado")).build());    }  
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> manageErro500(Exception ex) {

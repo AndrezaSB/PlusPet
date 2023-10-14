@@ -10,7 +10,7 @@ import br.com.pluspet.core.entity.Employee;
 
 public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
 
-	public Optional<Employee> findById(UUID appointmentId);
+	public Optional<Employee> findById(UUID employeeId);
 
 	public UserDetails findByLogin(String login);
 

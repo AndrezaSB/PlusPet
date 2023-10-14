@@ -15,11 +15,15 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "status_history")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class StatusHistory {
 
 	@Id
@@ -33,7 +37,7 @@ public class StatusHistory {
 
 	@ManyToOne
 	@JoinColumn(name = "employee")
-//	@NotNull(message = "Responsável {jakarta.validation.constraints.NotNull.message}")
+	@NotNull(message = "Responsável {jakarta.validation.constraints.NotNull.message}")
 	private Employee employee;
 
 	@ManyToOne(fetch = FetchType.LAZY)

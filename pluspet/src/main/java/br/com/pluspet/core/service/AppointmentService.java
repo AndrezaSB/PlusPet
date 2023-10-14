@@ -1,5 +1,8 @@
 package br.com.pluspet.core.service;
 
+import static java.util.stream.Collectors.toList;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,10 +14,13 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.pluspet.core.entity.Appointment;
+import br.com.pluspet.core.entity.Employee;
 import br.com.pluspet.core.entity.StatusHistory;
 import br.com.pluspet.core.enums.Status;
 import br.com.pluspet.core.repository.AppointmentRepository;
+import br.com.pluspet.core.util.AppointmentTypeUtil;
 import br.com.pluspet.core.vo.AppointmentFilter;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class AppointmentService extends AbstractService<Appointment, UUID, AppointmentRepository> {
@@ -39,10 +45,10 @@ public class AppointmentService extends AbstractService<Appointment, UUID, Appoi
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public Appointment createAppointment(Appointment appointment) {
+	public Appointment createAppointment(Appointment appointment, Employee employee) {
 
 		Appointment savedAppointment = repository.save(appointment);
-		savedAppointment.setStatus(statusService.createStatusHistory(savedAppointment).getStatus());
+		savedAppointment.setStatus(statusService.createStatusHistory(savedAppointment, employee).getStatus());
 
 		return savedAppointment;
 	}
@@ -62,11 +68,20 @@ public class AppointmentService extends AbstractService<Appointment, UUID, Appoi
 	}
 
 	@Transactional(propagation = Propagation.REQUIRED)
-	public Optional<Appointment> updateAppointmentStatusHistory(UUID appointmentId, Status status) {
+	public Optional<Appointment> updateAppointmentStatusHistory(UUID appointmentId, Status status, Employee employee) {
 		Optional<br.com.pluspet.core.entity.Appointment> appointment = repository.findById(appointmentId);
 
+		List<String> allowedTypes = AppointmentTypeUtil.getAllowedAppointmentsTypes(employee.getRole()).stream()
+				.map(type -> type.name()).collect(toList());
+
 		if (appointment.isPresent()) {
-			appointment.get().setStatus(statusService.updateStatusHistory(appointment.get(), status).getStatus());
+
+			if (!allowedTypes.contains(appointment.get().getAppointmentType().name())) {
+				throw new EntityNotFoundException();
+			}
+
+			appointment.get()
+					.setStatus(statusService.updateStatusHistory(appointment.get(), status, employee).getStatus());
 		}
 
 		return appointment;
@@ -76,11 +91,12 @@ public class AppointmentService extends AbstractService<Appointment, UUID, Appoi
 	private Status getCurrentStatus(UUID appointmentId) {
 		Optional<StatusHistory> history = statusService.findAppointmentsActualStatus(appointmentId);
 
-		if (history.isPresent()) {
-			return history.get().getStatus();
+		if (!history.isPresent()) {
+			throw new EntityNotFoundException();
 		}
 
-		return null;
+		return history.get().getStatus();
+
 	}
 
 }

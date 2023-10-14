@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import br.com.pluspet.core.entity.Pet;
 import br.com.pluspet.core.repository.PetRepository;
 import br.com.pluspet.core.vo.PetFilter;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class PetService extends AbstractService<Pet, UUID, PetRepository> {

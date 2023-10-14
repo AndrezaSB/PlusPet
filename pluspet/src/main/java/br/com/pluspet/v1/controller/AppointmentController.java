@@ -4,11 +4,9 @@ import static java.util.stream.Collectors.toList;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,15 +26,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import br.com.pluspet.core.entity.Employee;
 import br.com.pluspet.core.entity.Pet;
 import br.com.pluspet.core.enums.AppointmentType;
-import br.com.pluspet.core.enums.Role;
 import br.com.pluspet.core.enums.Status;
 import br.com.pluspet.core.service.AppointmentService;
 import br.com.pluspet.core.service.PetService;
 import br.com.pluspet.core.util.AppointmentTypeUtil;
 import br.com.pluspet.core.vo.AppointmentFilter;
-import br.com.pluspet.core.entity.Employee;
 import br.com.pluspet.v1.dto.Appointment;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -81,15 +78,26 @@ public class AppointmentController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Appointment> findAppointment(@PathVariable("id") UUID appointmentId) {
-		Appointment appointment = mapper.map(service.findById(appointmentId), Appointment.class);
+	public ResponseEntity<Appointment> findAppointment(@AuthenticationPrincipal Employee employee,
+			@PathVariable("id") UUID appointmentId) {
 
-		return Optional.ofNullable(appointment).map(appointmentResponse -> ResponseEntity.ok(appointmentResponse))
+		Optional<br.com.pluspet.core.entity.Appointment> appointment = service.findById(appointmentId);
+
+		List<String> allowedTypes = AppointmentTypeUtil.getAllowedAppointmentsTypes(employee.getRole()).stream()
+				.map(type -> type.name()).collect(toList());
+
+		if (appointment.isPresent() && allowedTypes.contains(appointment.get().getAppointmentType().name())) {
+			throw new EntityNotFoundException();
+		}
+
+		return Optional.ofNullable(appointment)
+				.map(appointmentResponse -> ResponseEntity.ok(mapper.map(appointmentResponse, Appointment.class)))
 				.orElseThrow(EntityNotFoundException::new);
 	}
 
 	@PostMapping
-	public ResponseEntity<Appointment> saveAppointment(@Valid @RequestBody Appointment appointment) {
+	public ResponseEntity<Appointment> saveAppointment(@AuthenticationPrincipal Employee employee,
+			@Valid @RequestBody Appointment appointment) {
 
 		Pet petEntity = Optional.ofNullable(petService.findByIdActive(appointment.getPet().getId()))
 				.map(pet -> pet.get()).orElseThrow(EntityNotFoundException::new);
@@ -99,7 +107,7 @@ public class AppointmentController {
 
 		saveAppointment.setPet(petEntity);
 
-		Appointment savedDTO = mapper.map(service.createAppointment(saveAppointment), Appointment.class);
+		Appointment savedDTO = mapper.map(service.createAppointment(saveAppointment, employee), Appointment.class);
 
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedDTO.getId())
 				.toUri();
@@ -109,19 +117,14 @@ public class AppointmentController {
 	}
 
 	@PutMapping("/{id}/status")
-	public ResponseEntity<Appointment> saveAppointment(@PathVariable("id") UUID appointmentId,
-			@RequestBody Status status) {
+	public ResponseEntity<Appointment> saveAppointment(@AuthenticationPrincipal Employee employee,
+			@PathVariable("id") UUID appointmentId, @RequestBody Status status) {
 
 		Optional.ofNullable(status).orElseThrow(EntityNotFoundException::new);
 
-		Optional<br.com.pluspet.core.entity.Appointment> appointment = service
-				.updateAppointmentStatusHistory(appointmentId, status);
-
-		if (!appointment.isPresent()) {
-			throw new EntityNotFoundException();
-		}
-
-		return ResponseEntity.ok(mapper.map(appointment.get(), Appointment.class));
+		return Optional.ofNullable(service.updateAppointmentStatusHistory(appointmentId, status, employee))
+				.map(appointmentResponse -> ResponseEntity.ok(mapper.map(appointmentResponse, Appointment.class)))
+				.orElseThrow(EntityNotFoundException::new);
 
 	}
 
